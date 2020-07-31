@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState,useEffect,useRef} from 'react';   //Add useRef for auto scroll
 import { Button,FormControl,InputLabel,Input } from '@material-ui/core';
 import Message from "./Message";
 import './App.css';
@@ -7,7 +7,6 @@ import firebase from 'firebase';
 import FlipMove from 'react-flip-move';
 import SendIcon from '@material-ui/icons/Send';
 import { IconButton } from '@material-ui/core';
-
 
 function App() {
 
@@ -25,6 +24,18 @@ function App() {
       setMessages(snapshot.docs.map(doc=>({id:doc.id,message:doc.data()})))
     })
   }, [])
+
+  // Line1 for auto scroll
+  const messagesEndRef = useRef(null)
+
+  //line 2 for auto scroll
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+  }
+
+  //line 3 for auto scroll
+  useEffect(scrollToBottom, [messages]);
+
 
   useEffect(() => {
     //run code here
@@ -60,16 +71,15 @@ function App() {
         </FormControl>
     </form>
       {/* buttons */}
-    <FlipMove>
-      {
-        messages.map(({id,message})=>(
-          <Message key={id} username={username} message={message}/>
-        ))
-      }
-    </FlipMove>
+      <FlipMove>
+        {
+          messages.map(({id,message})=>(
+            <Message key={id} username={username} message={message}/>
+          ))
+        }
+      </FlipMove>
       
-      {/* message themselves */}
-
+      <div ref={messagesEndRef} />
     </div>
   );
 }
